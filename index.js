@@ -10,7 +10,7 @@ function promptUser() {
         [
             // Obj notation
             { 
-            message: 'What would department would you like to view?',
+            message: 'What would you like to do?',
             name: 'choice',
             type: 'list',
             choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role', 'quit']
@@ -18,16 +18,42 @@ function promptUser() {
            
         ]
     )
-    .then((
-        answers
-    ) => {
+    .then((answers) => {
         let choice = answers.choice;
-        if (choice === 'view all employees') {
+        if (choice === 'view all departments') {
+            viewAllDepts();
+        } else if (choice === 'view all roles') {
+            viewAllRoles();
+        } else if (choice === 'view all employees') {
             viewAllEmployees();
-        } else if (choice === 'quit') {
-            quitPrompts();
         }
     }) 
+}
+
+function viewAllDepts() {
+    db.query (
+        'SELECT * FROM department',
+        (error, results) => {
+            if (error) {
+                throw error;
+            }
+            console.table(results);
+            promptUser();
+        }
+    )
+}
+
+function viewAllRoles() {
+    db.query (
+        'SELECT * FROM role',
+        (error, results) => {
+            if (error) {
+                throw error;
+            }
+            console.table(results);
+            promptUser();
+        }
+    )
 }
 
 function viewAllEmployees() {
@@ -44,18 +70,6 @@ function viewAllEmployees() {
     )
 }
 
-function viewDeptEmp() {
-    db.query (
-        'SELECT * FROM',
-        (error, results) => {
-            if (error) {
-                throw error;
-            }
-            console.table(results);
-            promptUser();
-        }
-    )
-}
 
 
 function quitPrompts() {

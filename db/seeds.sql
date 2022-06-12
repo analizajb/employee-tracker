@@ -1,4 +1,4 @@
-INSERT INTO department (dept_name)
+INSERT INTO department (name)
 VALUES 
     ('Management'),
     ('Marketing'),
@@ -44,3 +44,7 @@ VALUES
     ('Alberto', 'Scorfano', 7, 3),
     ('Benne', 'Ciao', 8, 3),
     ('Kris', 'Jenner', 12, 1);
+
+-- SELECT roles.*, department.name --
+ --   -> FROM roles --
+   -- -> LEFT JOIN department ON roles.department_id = department.id; --

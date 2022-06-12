@@ -6,18 +6,25 @@ require('console.table');
 
 // Function declaration: hoisting.
 function promptUser() {
-    inquirer.prompt (
-        [
-            // Obj notation
-            { 
-            message: 'What would you like to do?',
-            name: 'choice',
-            type: 'list',
-            choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role', 'quit']
+    inquirer
+        .prompt ([
+        // Obj notation
+        { 
+         message: 'What would you like to do?',
+         name: 'choice',
+         type: 'list',
+         choices: [
+         'View all departments',  
+         'View all roles', 
+         'View all employees', 
+         'Add a department', 
+         'Add a role', 
+         'Add an employee', 
+         'Update an employee role', 
+         'Quit'
+         ]
         },
-           
-        ]
-    )
+    ])
     .then((answers) => {
         let choice = answers.choice;
         if (choice === 'view all departments') {
@@ -68,7 +75,9 @@ function viewAllEmployees() {
             promptUser();
         }
     )
-}
+};
+
+function 
 
 
 

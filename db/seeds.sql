@@ -1,4 +1,4 @@
-INSERT INTO department (name)
+INSERT INTO department (dept_name)
 VALUES 
     ('Management'),
     ('Marketing'),
@@ -6,7 +6,7 @@ VALUES
     ('Sales'),
     ('Product Development');
 
-INSERT INTO role (title, salary, department_id)
+INSERT INTO roles (title, salary, department_id)
 VALUES 
     ('General Manager', 100000, 1),
     ('Marketing Manager', 120000, 1),

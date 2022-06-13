@@ -13,26 +13,19 @@ function promptUser() {
          message: 'What would you like to do?',
          name: 'choice',
          type: 'list',
-         choices: [
-         'View all departments',  
-         'View all roles', 
-         'View all employees', 
-         'Add a department', 
-         'Add a role', 
-         'Add an employee', 
-         'Update an employee role', 
-         'Quit'
-         ]
+         choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Quit']
         },
     ])
     .then((answers) => {
         let choice = answers.choice;
-        if (choice === 'view all departments') {
+        if (choice === 'View all departments') {
             viewAllDepts();
-        } else if (choice === 'view all roles') {
+        } else if (choice === 'View all roles') {
             viewAllRoles();
-        } else if (choice === 'view all employees') {
+        } else if (choice === 'View all employees') {
             viewAllEmployees();
+        } else if (choice === 'Quit') {
+            quitPrompts();
         }
     }) 
 }
@@ -52,7 +45,7 @@ function viewAllDepts() {
 
 function viewAllRoles() {
     db.query (
-        'SELECT * FROM role',
+        'SELECT r.title AS Roles, r.salary AS "Salary", d.name AS "Departments" FROM roles r JOIN department d ON d.id = r.department_id ORDER BY Departments desc;',
         (error, results) => {
             if (error) {
                 throw error;
@@ -66,7 +59,7 @@ function viewAllRoles() {
 function viewAllEmployees() {
     // This is a function
     db.query (
-        'SELECT * FROM employee',
+        'SELECT employee.first_name AS "Name" FROM employees;',
         (error, results) => {
             if (error) {
                 throw error;
@@ -77,7 +70,19 @@ function viewAllEmployees() {
     )
 };
 
-function 
+function addDepartment() {
+    // Code to follow
+}
+function addRole() {
+    // Code to follow
+}
+function addEmployee() {
+    // Code to follow
+}
+function updateEmpRole() {
+
+}
+
 
 
 

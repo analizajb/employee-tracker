@@ -9,7 +9,7 @@ const promptUser = () => {
       {
         type: "list",
         name: "choice",
-        message: "Select from the following...",
+        message: "Select from the following choices...",
         choices: [
           "View all departments",
           "View all roles",
@@ -49,9 +49,9 @@ const promptUser = () => {
           break;
         default:
           db.end();
-      };
-    })
-}
+      }
+    });
+};
 
 // Display departments
 const viewAllDepartments = () => {
@@ -59,6 +59,26 @@ const viewAllDepartments = () => {
   db.query(sql, (err,res) => {
     if(err) throw err;
     console.table('Departments:', res);
+    promptUser();
+  })
+}
+
+// Display roles
+const viewAllRoles = () => {
+  const sql = 'SELECT * FROM role';
+  db.query(sql, (err,res) => {
+    if(err) throw err;
+    console.table('Roles:', res);
+    promptUser();
+  })
+}
+
+// Display employees
+const viewAllEmployees = () => {
+  const sql = 'SELECT * FROM employee';
+  db.query(sql, (err,res) => {
+    if(err) throw err;
+    console.table('Employees:', res);
     promptUser();
   })
 }

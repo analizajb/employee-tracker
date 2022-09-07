@@ -4,10 +4,12 @@ require('dotenv').config()
 const db = mysql.createConnection({
   host: 'localhost',
   // Your MySQL username,
-  user: MYSQL_USER,
+  user: process.env.MYSQL_USER,
   // Your MySQL password
-  password: MYSQL_PASSWORD,
+  password: process.env.MYSQL_PASSWORD,
   database: 'employee-tracker'
-});
+},
+ console.log("You're now connected to the employee-tracker database!")
+);
 
 module.exports = db;

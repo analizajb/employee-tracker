@@ -90,4 +90,37 @@ const viewAllEmployees = () => {
   });
 };
 
+// Add department
+const addDepartment = () => {
+  inquirer.prompt([
+    {
+      type: 'input',
+      name: 'department',
+      message: "Please enter the department name you'd like to add",
+    }
+  ])
+  .then(answer => {
+    const {department} = answer;
+    const sql = `SELECT * FROM department where name = ?`;
+
+    db.query(sql, department, (err, res) => {
+      if(err) throw err;
+
+      if(res.length) {
+        console.log(`${department} already exists in the database.`);
+        promptUser();
+      } else {
+        const add = `INSERT INTO department(name)
+        VALUES (?)`;
+        db.query(add, department, (err, res) => {
+          if(err) throw err;
+          console.log(`${department} has been successfully added to the database!`);
+          promptUser();
+        })
+      }
+    }) 
+  })
+}
+
+
 promptUser();

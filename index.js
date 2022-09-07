@@ -55,32 +55,33 @@ const promptUser = () => {
 
 // Display departments
 const viewAllDepartments = () => {
-  const sql = 'SELECT * FROM department';
-  db.query(sql, (err,res) => {
-    if(err) throw err;
-    console.table('Departments:', res);
+  const sql = "SELECT * FROM department";
+  db.query(sql, (err, res) => {
+    if (err) throw err;
+    console.table("Departments:", res);
     promptUser();
-  })
-}
+  });
+};
 
 // Display roles
 const viewAllRoles = () => {
-  const sql = 'SELECT * FROM role';
-  db.query(sql, (err,res) => {
-    if(err) throw err;
-    console.table('Roles:', res);
+  const sql =
+    "SELECT role.id, role.title as role, role.salary, department.name AS department FROM role LEFT JOIN department ON role.department_id = department.id";
+  db.query(sql, (err, res) => {
+    if (err) throw err;
+    console.table("Roles:", res);
     promptUser();
-  })
-}
+  });
+};
 
 // Display employees
 const viewAllEmployees = () => {
-  const sql = 'SELECT * FROM employee';
-  db.query(sql, (err,res) => {
-    if(err) throw err;
-    console.table('Employees:', res);
+  const sql = "SELECT * FROM employee";
+  db.query(sql, (err, res) => {
+    if (err) throw err;
+    console.table("Employees:", res);
     promptUser();
-  })
-}
+  });
+};
 
 promptUser();

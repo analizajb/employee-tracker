@@ -18,6 +18,7 @@ const promptUser = () => {
           "Add role",
           "Add employee",
           "Update employee",
+          "Delete department",
           "Exit",
         ],
       },
@@ -46,6 +47,9 @@ const promptUser = () => {
           break;
         case "Update employee":
           updateEmployee();
+          break;
+        case "Delete department":
+          deleteDepartment();
           break;
         default:
           db.end();
@@ -363,6 +367,16 @@ const updateEmployee = () => {
             });
         });
       });
+  });
+};
+
+// Delete department
+const deleteDepartment = () => {
+  const sql = `SELECT * FROM department`;
+  db.query(sql, (err, res) => {
+    if (err) throw err;
+    console.table("Departments:", res);
+    promptUser();
   });
 };
 

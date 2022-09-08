@@ -127,147 +127,243 @@ const addDepartment = () => {
 
 // Add role
 const addRole = () => {
-  inquirer.prompt([
-    {
-      type: 'input',
-      name: 'role',
-      message: "Please enter the role you'd like to add.",
-    },
-    {
-      type: 'input',
-      name: 'salary',
-      message: 'What is the expected salary for this role?',
-    }
-  ])
-  .then(roleData => {
-    const {role, salary} = roleData;
-    
-    // List departments to choose from
-    const deptList  = 'SELECT * FROM department';
-    db.query(deptList, (err,deptTable) => {
-      if(err) throw err;
-      const deptChosen = [];
-      deptTable.forEach(deptInfo => deptChosen.push(deptInfo.name));
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "role",
+        message: "Please enter the role you'd like to add.",
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "What is the expected salary for this role?",
+      },
+    ])
+    .then((roleData) => {
+      const { role, salary } = roleData;
 
-      // Link role to a department
-      inquirer.prompt([
-        {
-          type: 'list',
-          name: 'dept',
-          message: 'Which department will this role belong to?',
-          choices: deptChosen
-        }
-      ])
-      .then(deptAnswer => {
-        const {dept} = deptAnswer;
-        const targetDept = deptTable.filter(deptInfo => deptInfo.name === dept);
+      // List departments to choose from
+      const deptList = "SELECT * FROM department";
+      db.query(deptList, (err, deptTable) => {
+        if (err) throw err;
+        const deptChosen = [];
+        deptTable.forEach((deptInfo) => deptChosen.push(deptInfo.name));
 
-        // Check if role, salary and dept_id already exist
-        const roleSql = `SELECT * FROM role WHERE title = ? AND salary = ? AND department_id = ?`;
-        const params = [role, salary, targetDept[0].id];
-        db.query(roleSql, params, (err,res) => {
-          if(err) throw err;
+        // Link role to a department
+        inquirer
+          .prompt([
+            {
+              type: "list",
+              name: "dept",
+              message: "Which department will this role belong to?",
+              choices: deptChosen,
+            },
+          ])
+          .then((deptAnswer) => {
+            const { dept } = deptAnswer;
+            const targetDept = deptTable.filter(
+              (deptInfo) => deptInfo.name === dept
+            );
 
-          // If existing role...
-          if(res.length) {
-            console.log(`${role} with a salary of ${salary} in the ${dept} department already exists in this database.`);
-            promptUser();
-          }
-          // If no existing role...
-          else {
-            const addSql = `INSERT INTO role(title, salary, department_id)
+            // Check if role, salary and dept_id already exist
+            const roleSql = `SELECT * FROM role WHERE title = ? AND salary = ? AND department_id = ?`;
+            const params = [role, salary, targetDept[0].id];
+            db.query(roleSql, params, (err, res) => {
+              if (err) throw err;
+
+              // If existing role...
+              if (res.length) {
+                console.log(
+                  `${role} with a salary of ${salary} in the ${dept} department already exists in this database.`
+                );
+                promptUser();
+              }
+              // If no existing role...
+              else {
+                const addSql = `INSERT INTO role(title, salary, department_id)
               VALUES(?,?,?)`;
-            db.query(addSql, params, (err, res) => {
-              if(err) throw err;
+                db.query(addSql, params, (err, res) => {
+                  if (err) throw err;
 
-              console.log(`${role} has been successfully added to the database.`);
-              promptUser();
-            })
-          }
-        })
-      })
-    })
-  })
-}
+                  console.log(
+                    `${role} has been successfully added to the database.`
+                  );
+                  promptUser();
+                });
+              }
+            });
+          });
+      });
+    });
+};
 
 // Add employee
 const addEmployee = () => {
-  inquirer.prompt([
-    {
-      type: 'input',
-      name: 'first_name',
-      message: "Please enter the employee's first name"
-    },
-    {
-      type: 'input',
-      name: 'last_name',
-      message: "Please enter the employee's last name"
-    }
-  ])
-  .then(employeeName => {
-    const {first_name, last_name} = employeeName;
-    
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "first_name",
+        message: "Please enter the employee's first name",
+      },
+      {
+        type: "input",
+        name: "last_name",
+        message: "Please enter the employee's last name",
+      },
+    ])
+    .then((employeeName) => {
+      const { first_name, last_name } = employeeName;
 
-    // List roles to choose from
-    db.query('SELECT * FROM role', (err,roleTable) => {
-      if(err) throw err;
-      const roleChosen = [];
-      roleTable.forEach(roleInfo => roleChosen.push(roleInfo.title));
+      // List roles to choose from
+      db.query("SELECT * FROM role", (err, roleTable) => {
+        if (err) throw err;
+        const roleChosen = [];
+        roleTable.forEach((roleInfo) => roleChosen.push(roleInfo.title));
 
-      // Continue prompt to select role
-      inquirer.prompt([
-        {
-          type: 'list',
-          name: 'role',
-          message: "What is the employee's role?",
-          choices: roleChosen
-        }
-      ])
-      .then(roleAnswer => {
-        const {role} = roleAnswer;
-        const targetRole = roleTable.filter(roleInfo => roleInfo.title === role);
-
-        // Select a manager
-        db.query('SELECT * FROM employee', (err,empTable) => {
-          if(err) throw err;
-          
-          // List managers to choose from
-          const managerChosen = [];
-          empTable.forEach(empInfo => managerChosen.push(empInfo.first_name + ' ' + empInfo.last_name));
-          managerChosen.push("None")
-
-          // Employee's manager input request
-          inquirer.prompt([
+        // Continue prompt to select role
+        inquirer
+          .prompt([
             {
-              type: 'list',
-              name: 'manager',
-              message: "Please enter the employee's manager",
-              choices: managerChosen
-            }
+              type: "list",
+              name: "role",
+              message: "What is the employee's role?",
+              choices: roleChosen,
+            },
           ])
-          .then(managerAnswer => {
-            // Gets manager information
-            const {manager} = managerAnswer;
-            let manager_id = null;
-            if(manager !== 'None') {
-              const targetManager = empTable.filter(empInfo => empInfo.first_name === manager.split(' ')[0] && empInfo.last_name === manager.split(' ')[1]);
-              manager_id = targetManager[0].id;
-            }
-            // Add employee to database
-            const addSql = `INSERT INTO employee(first_name, last_name, role_id, manager_id)
+          .then((roleAnswer) => {
+            const { role } = roleAnswer;
+            const targetRole = roleTable.filter(
+              (roleInfo) => roleInfo.title === role
+            );
+
+            // Select a manager
+            db.query("SELECT * FROM employee", (err, empTable) => {
+              if (err) throw err;
+
+              // List managers to choose from
+              const managerChosen = [];
+              empTable.forEach((empInfo) =>
+                managerChosen.push(empInfo.first_name + " " + empInfo.last_name)
+              );
+              managerChosen.push("None");
+
+              // Employee's manager input request
+              inquirer
+                .prompt([
+                  {
+                    type: "list",
+                    name: "manager",
+                    message: "Please enter the employee's manager",
+                    choices: managerChosen,
+                  },
+                ])
+                .then((managerAnswer) => {
+                  // Gets manager information
+                  const { manager } = managerAnswer;
+                  let manager_id = null;
+                  if (manager !== "None") {
+                    const targetManager = empTable.filter(
+                      (empInfo) =>
+                        empInfo.first_name === manager.split(" ")[0] &&
+                        empInfo.last_name === manager.split(" ")[1]
+                    );
+                    manager_id = targetManager[0].id;
+                  }
+                  // Add employee to database
+                  const addSql = `INSERT INTO employee(first_name, last_name, role_id, manager_id)
               VALUES (?,?,?,?)`;
-            const params = [first_name, last_name, targetRole[0].id, manager_id];
-            db.query(addSql, params, (err,res) => {
-              if(err) throw err;
-              
-              console.log(`${first_name} ${last_name} has been successfully added to the database.`);
-              promptUser();
-            })
-          })
-        })
-      })
-    })
-  })
-}
+                  const params = [
+                    first_name,
+                    last_name,
+                    targetRole[0].id,
+                    manager_id,
+                  ];
+                  db.query(addSql, params, (err, res) => {
+                    if (err) throw err;
+
+                    console.log(
+                      `${first_name} ${last_name} has been successfully added to the database.`
+                    );
+                    promptUser();
+                  });
+                });
+            });
+          });
+      });
+    });
+};
+
+// Update employee
+const updateEmployee = () => {
+  // All employees
+  db.query("SELECT id,first_name, last_name FROM employee", (err, empTable) => {
+    if (err) throw err;
+
+    // List of employees
+    const empChosen = [];
+    empTable.forEach((empInfo) =>
+      empChosen.push(empInfo.first_name + " " + empInfo.last_name)
+    );
+
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "employee",
+          message: "Select the employee whose role you'd like to update.",
+          choices: empChosen,
+        },
+      ])
+      .then((answer) => {
+        const { employee } = answer;
+        const [first_name, last_name] = employee.split(" ");
+
+        const updatedEmp = empTable.filter(
+          (empInfo) =>
+            empInfo.first_name === first_name && empInfo.last_name === last_name
+        );
+        const updatedEmpId = updatedEmp[0].id;
+
+        // All roles
+        db.query(`SELECT id, title FROM role`, (err, roleTable) => {
+          if (err) throw err;
+          // List of roles
+          const roleChosen = [];
+          roleTable.forEach((roleInfo) => roleChosen.push(roleInfo.title));
+          inquirer
+            .prompt([
+              {
+                type: "list",
+                name: "role",
+                message: ` Assign the updated role for ${employee}.`,
+                choices: roleChosen,
+              },
+            ])
+            .then((updatedRole) => {
+              const { role } = updatedRole;
+              const targetRole = roleTable.filter(
+                (roleInfo) => roleInfo.title === role
+              );
+              const updatedRoleId = targetRole[0].id;
+
+              // Update employee role to database
+              const updateEmpRole = `Update employee
+        SET role_id = ?
+        WHERE id =?`;
+              const params = [updatedRoleId, updatedEmpId];
+              db.query(updateEmpRole, params, (err, res) => {
+                if (err) throw err;
+                console.log(
+                  `${employee}'s role has been successfuly updated and added to the database!`
+                );
+                promptUser();
+              });
+            });
+        });
+      });
+  });
+};
 
 promptUser();

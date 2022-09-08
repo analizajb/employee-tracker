@@ -10,11 +10,15 @@ A command-line application to manage a company's employee database, using Node.j
 
 ## Demo
 
-----> Link here <----
+<img src='./assets/Analiza B. - employee_tracker.gif' width=500 />
+<br>
+
+Click [HERE](https://drive.google.com/file/d/18dqLt5fZqbLBOwwt0YlFjSAudGxz62_V/view) for the full video demonstration.
 
 ## Installation
 - Clone repository from https://github.com/analizajb/employee-tracker
 - run `npm i` to install necessary packages.
+- run `npm start` in the terminal to start the application.
 
 ## Usage
 For business owners that want to view and manage the departments, roles, and employees in their company to efficiently organize and plan their business.

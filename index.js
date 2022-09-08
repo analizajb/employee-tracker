@@ -125,7 +125,7 @@ const addDepartment = () => {
     });
 };
 
-// Add a role
+// Add role
 const addRole = () => {
   inquirer.prompt([
     {
@@ -184,6 +184,86 @@ const addRole = () => {
               promptUser();
             })
           }
+        })
+      })
+    })
+  })
+}
+
+// Add employee
+const addEmployee = () => {
+  inquirer.prompt([
+    {
+      type: 'input',
+      name: 'first_name',
+      message: "Please enter the employee's first name"
+    },
+    {
+      type: 'input',
+      name: 'last_name',
+      message: "Please enter the employee's last name"
+    }
+  ])
+  .then(employeeName => {
+    const {first_name, last_name} = employeeName;
+    
+
+    // List roles to choose from
+    db.query('SELECT * FROM role', (err,roleTable) => {
+      if(err) throw err;
+      const roleChosen = [];
+      roleTable.forEach(roleInfo => roleChosen.push(roleInfo.title));
+
+      // Continue prompt to select role
+      inquirer.prompt([
+        {
+          type: 'list',
+          name: 'role',
+          message: "What is the employee's role?",
+          choices: roleChosen
+        }
+      ])
+      .then(roleAnswer => {
+        const {role} = roleAnswer;
+        const targetRole = roleTable.filter(roleInfo => roleInfo.title === role);
+
+        // Select a manager
+        db.query('SELECT * FROM employee', (err,empTable) => {
+          if(err) throw err;
+          
+          // List managers to choose from
+          const managerChosen = [];
+          empTable.forEach(empInfo => managerChosen.push(empInfo.first_name + ' ' + empInfo.last_name));
+          managerChosen.push("None")
+
+          // Employee's manager input request
+          inquirer.prompt([
+            {
+              type: 'list',
+              name: 'manager',
+              message: "Please enter the employee's manager",
+              choices: managerChosen
+            }
+          ])
+          .then(managerAnswer => {
+            // Gets manager information
+            const {manager} = managerAnswer;
+            let manager_id = null;
+            if(manager !== 'None') {
+              const targetManager = empTable.filter(empInfo => empInfo.first_name === manager.split(' ')[0] && empInfo.last_name === manager.split(' ')[1]);
+              manager_id = targetManager[0].id;
+            }
+            // Add employee to database
+            const addSql = `INSERT INTO employee(first_name, last_name, role_id, manager_id)
+              VALUES (?,?,?,?)`;
+            const params = [first_name, last_name, targetRole[0].id, manager_id];
+            db.query(addSql, params, (err,res) => {
+              if(err) throw err;
+              
+              console.log(`${first_name} ${last_name} has been successfully added to the database.`);
+              promptUser();
+            })
+          })
         })
       })
     })

@@ -20,6 +20,8 @@ const promptUser = () => {
           "Add employee",
           "Update employee",
           "Delete department",
+          "Delete role",
+          "Delete employee",
           "Exit",
         ],
       },
@@ -51,6 +53,12 @@ const promptUser = () => {
           break;
         case "Delete department":
           deleteDepartment();
+          break;
+        case "Delete role":
+          deleteRole();
+          break;
+        case "Delete employee":
+          deleteEmployee();
           break;
         default:
           db.end();
@@ -375,32 +383,104 @@ const updateEmployee = () => {
 const deleteDepartment = () => {
   db.query("SELECT * FROM department", function (err, res) {
     const departmentChosen = res.map(({ id, name }) => ({
-        name: name,
-        value: id,
+      name: name,
+      value: id,
     }));
 
     // prompts user to choose a department
     inquirer
-        .prompt({
-            name: "id",
-            message: "Which department do you want to delete?",
-            type: "list",
-            choices: departmentChosen,
-        })
-        .then((department) => {
-          const {deletedDepartment} = department;
-            // queries database to remove the chosen department from the departments table
-            db.query("DELETE FROM department WHERE id = ?", department.id, function (err, row) {
-                if (err) throw err;
-                console.log(`${deletedDepartment} has been deleted!`);
-            });
+      .prompt({
+        name: "id",
+        message: "Which department do you want to delete?",
+        type: "list",
+        choices: departmentChosen,
+      })
+      .then((department) => {
+        const { deletedDepartment } = department;
+        // queries database to remove the chosen department from the departments table
+        db.query(
+          "DELETE FROM department WHERE id = ?",
+          department.id,
+          function (err, row) {
+            if (err) throw err;
+            console.log(`${deletedDepartment} has been deleted!`);
+          }
+        );
 
-            db.query("SELECT * FROM department", (err, res) => {
-                console.table(res);
-                promptUser();
-            });
+        db.query("SELECT * FROM department", (err, res) => {
+          console.table(res);
+          promptUser();
         });
-});
+      });
+  });
+};
+
+// Delete role
+const deleteRole = () => {
+  db.query("SELECT * FROM role", function (err, res) {
+    const roleChosen = res.map(({ id, title }) => ({
+      name: title,
+      value: id,
+    }));
+
+    // prompts user to choose a role
+    inquirer
+      .prompt({
+        name: "id",
+        message: "Which role do you want to delete?",
+        type: "list",
+        choices: roleChosen,
+      })
+      .then((role) => {
+        const { deletedRole } = role;
+        // queries database to remove the chosen role from the role table
+        db.query("DELETE FROM role WHERE id = ?", role.id, function (err, row) {
+          if (err) throw err;
+          console.log(`${deletedRole} has been deleted!`);
+        });
+
+        db.query("SELECT * FROM role", (err, res) => {
+          console.table(res);
+          promptUser();
+        });
+      });
+  });
+};
+
+// Delete employee
+const deleteEmployee = () => {
+  db.query("SELECT * FROM employee", (err, res) => {
+    const employees = res.map(({ id, first_name, last_name }) => ({
+      name: [first_name + " " + last_name],
+      value: id,
+    }));
+
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "id",
+          message: "Select the employee you'd like to delete.",
+          choices: employees,
+        },
+      ])
+      .then((employee) => {
+        db.query(
+          "DELETE FROM employee WHERE id = ?",
+          employee.id,
+          function (err, row) {
+            if (err) throw err;
+            console.log("Employee was successfully deleted!");
+          }
+        );
+
+        db.query("SELECT * FROM employee", (err, res) => {
+          console.log("Updated employee list:");
+          console.table(res);
+          promptUser();
+        });
+      });
+  });
 };
 
 promptUser();

@@ -92,35 +92,102 @@ const viewAllEmployees = () => {
 
 // Add department
 const addDepartment = () => {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "department",
+        message: "Please enter the department name you'd like to add",
+      },
+    ])
+    .then((answer) => {
+      const { department } = answer;
+      const sql = `SELECT * FROM department where name = ?`;
+
+      db.query(sql, department, (err, res) => {
+        if (err) throw err;
+
+        if (res.length) {
+          console.log(`${department} already exists in the database.`);
+          promptUser();
+        } else {
+          const add = `INSERT INTO department(name)
+        VALUES (?)`;
+          db.query(add, department, (err, res) => {
+            if (err) throw err;
+            console.log(
+              `${department} has been successfully added to the database!`
+            );
+            promptUser();
+          });
+        }
+      });
+    });
+};
+
+// Add a role
+const addRole = () => {
   inquirer.prompt([
     {
       type: 'input',
-      name: 'department',
-      message: "Please enter the department name you'd like to add",
+      name: 'role',
+      message: "Please enter the role you'd like to add.",
+    },
+    {
+      type: 'input',
+      name: 'salary',
+      message: 'What is the expected salary for this role?',
     }
   ])
-  .then(answer => {
-    const {department} = answer;
-    const sql = `SELECT * FROM department where name = ?`;
-
-    db.query(sql, department, (err, res) => {
+  .then(roleData => {
+    const {role, salary} = roleData;
+    
+    // List departments to choose from
+    const deptList  = 'SELECT * FROM department';
+    db.query(deptList, (err,deptTable) => {
       if(err) throw err;
+      const deptChosen = [];
+      deptTable.forEach(deptInfo => deptChosen.push(deptInfo.name));
 
-      if(res.length) {
-        console.log(`${department} already exists in the database.`);
-        promptUser();
-      } else {
-        const add = `INSERT INTO department(name)
-        VALUES (?)`;
-        db.query(add, department, (err, res) => {
+      // Link role to a department
+      inquirer.prompt([
+        {
+          type: 'list',
+          name: 'dept',
+          message: 'Which department will this role belong to?',
+          choices: deptChosen
+        }
+      ])
+      .then(deptAnswer => {
+        const {dept} = deptAnswer;
+        const targetDept = deptTable.filter(deptInfo => deptInfo.name === dept);
+
+        // Check if role, salary and dept_id already exist
+        const roleSql = `SELECT * FROM role WHERE title = ? AND salary = ? AND department_id = ?`;
+        const params = [role, salary, targetDept[0].id];
+        db.query(roleSql, params, (err,res) => {
           if(err) throw err;
-          console.log(`${department} has been successfully added to the database!`);
-          promptUser();
+
+          // If existing role...
+          if(res.length) {
+            console.log(`${role} with a salary of ${salary} in the ${dept} department already exists in this database.`);
+            promptUser();
+          }
+          // If no existing role...
+          else {
+            const addSql = `INSERT INTO role(title, salary, department_id)
+              VALUES(?,?,?)`;
+            db.query(addSql, params, (err, res) => {
+              if(err) throw err;
+
+              console.log(`${role} has been successfully added to the database.`);
+              promptUser();
+            })
+          }
         })
-      }
-    }) 
+      })
+    })
   })
 }
-
 
 promptUser();
